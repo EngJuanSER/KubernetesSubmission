@@ -10,6 +10,11 @@ This repository contains my submissions for the [DevOps with Kubernetes](https:/
 - [1.2.](https://github.com/EngJuanSER/KubernetesSubmission/tree/1.2/the_project) Project v0.1 - Basic server
 - [1.3.](https://github.com/EngJuanSER/KubernetesSubmission/tree/1.3/log_output) Declarative deployment for log output
 - [1.4.](https://github.com/EngJuanSER/KubernetesSubmission/tree/1.4/the_project) Declarative deployment for project
+- [1.5.](https://github.com/EngJuanSER/KubernetesSubmission/tree/1.5/the_project) Project v0.2 - HTTP endpoint
+- [1.6.](https://github.com/EngJuanSER/KubernetesSubmission/tree/1.6/the_project) Project v0.3 - NodePort Service
+- [1.7.](https://github.com/EngJuanSER/KubernetesSubmission/tree/1.7/log_output) Log output with Ingress
+- [1.8.](https://github.com/EngJuanSER/KubernetesSubmission/tree/1.8/the_project) Project v0.4 - Ingress
+- [1.9.](https://github.com/EngJuanSER/KubernetesSubmission/tree/1.9/ping_pong) Ping-pong app with shared Ingress
 
 ### Part 2
 
