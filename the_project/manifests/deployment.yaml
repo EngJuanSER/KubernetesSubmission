@@ -17,7 +17,7 @@ spec:
           emptyDir: {}
       containers:
         - name: todo-app
-          image: engjuanser/todo-app:1.12
+          image: engjuanser/todo-app:1.13
           env:
             - name: PORT
               value: "3000"
