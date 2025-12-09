@@ -1,21 +1,40 @@
 # Ping-Pong Application
 
-A simple application that counts requests and responds with "pong N" at the `/pingpong` endpoint.
+A counter service that increments and persists its state using PersistentVolumes.
 
-## Building the Docker image
+## Current State (Exercise 1.11)
+
+- HTTP server that responds with "pong N" where N is an incrementing counter
+- Counter persists to disk using **PersistentVolumeClaim**
+- Counter survives pod restarts and is shared with log-output app
+
+## How to Access
+
+The application is accessible through the shared Ingress:
 
 ```bash
-docker build -t engjuanser/ping-pong:1.9 .
-docker push engjuanser/ping-pong:1.9
+# Increment counter and see response
+curl http://localhost:8081/pingpong
+# Output: pong N
 ```
 
-## Deploying to Kubernetes
+## Architecture
 
-```bash
-kubectl apply -f manifests/deployment.yaml
-kubectl apply -f manifests/service.yaml
+```
+Pod: ping-pong
+└── Container (engjuanser/ping-pong:1.11)
+    ├── Persists to: /usr/src/app/data/counter.txt (PVC)
+    └── Serves: HTTP on port 3000
+    
+PersistentVolume: local-pv (1Gi)
+└── Mounted on: k3d-k3s-default-agent-0:/tmp/kube
 ```
 
-## Usage
+## Evolution
 
-Access via the shared Ingress at `http://localhost:8081/pingpong`
+- **1.9**: Basic counter service with Ingress
+- **1.11**: Added PersistentVolume for data persistence
+
+## See Also
+
+Refer to the [main README](../README.md) for complete exercise history and links to each version.
