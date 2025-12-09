@@ -16,6 +16,7 @@ This repository contains my submissions for the [DevOps with Kubernetes](https:/
 - [1.8.](https://github.com/EngJuanSER/KubernetesSubmission/tree/1.8/the_project) Project v0.4 - Ingress
 - [1.9.](https://github.com/EngJuanSER/KubernetesSubmission/tree/1.9/ping_pong) Ping-pong app with shared Ingress
 - [1.10.](https://github.com/EngJuanSER/KubernetesSubmission/tree/1.10/log_output) Split log-output into writer and reader using emptyDir
+- [1.11.](https://github.com/EngJuanSER/KubernetesSubmission/tree/1.11/cluster-resources) Persisting data with PersistentVolumes
 
 ### Part 2
 
