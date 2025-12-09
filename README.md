@@ -18,6 +18,7 @@ This repository contains my submissions for the [DevOps with Kubernetes](https:/
 - [1.10.](https://github.com/EngJuanSER/KubernetesSubmission/tree/1.10/log_output) Split log-output into writer and reader using emptyDir
 - [1.11.](https://github.com/EngJuanSER/KubernetesSubmission/tree/1.11/cluster-resources) Persisting data with PersistentVolumes
 - [1.12.](https://github.com/EngJuanSER/KubernetesSubmission/tree/1.12/the_project) Image with hourly caching
+- [1.13.](https://github.com/EngJuanSER/KubernetesSubmission/tree/1.13/the_project) Todo form with input and hardcoded list
 
 ### Part 2
 
