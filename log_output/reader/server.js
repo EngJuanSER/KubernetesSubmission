@@ -2,18 +2,32 @@ const http = require('http');
 const fs = require('fs');
 
 const PORT = 3000;
-const filePath = '/usr/src/app/files/log.txt';
+const logFile = '/usr/src/app/files/log.txt';
+const counterFile = '/usr/src/app/data/counter.txt';
 
 const server = http.createServer((req, res) => {
   if (req.url === '/' && req.method === 'GET') {
-    if (fs.existsSync(filePath)) {
-      const content = fs.readFileSync(filePath, 'utf-8');
-      res.writeHead(200, { 'Content-Type': 'text/plain' });
-      res.end(content);
+    let output = '';
+    
+    // Leer última línea del log
+    if (fs.existsSync(logFile)) {
+      const lines = fs.readFileSync(logFile, 'utf-8').trim().split('\n');
+      output = lines[lines.length - 1];
     } else {
-      res.writeHead(404, { 'Content-Type': 'text/plain' });
-      res.end('Log file not found yet. Writer may not have written anything.');
+      output = 'Log file not found yet';
     }
+    
+    // Leer contador desde el volumen persistente
+    let counter = 0;
+    if (fs.existsSync(counterFile)) {
+      const content = fs.readFileSync(counterFile, 'utf-8').trim();
+      counter = parseInt(content) || 0;
+    }
+    
+    const response = `${output}\nPing / Pongs: ${counter}\n`;
+    
+    res.writeHead(200, { 'Content-Type': 'text/plain' });
+    res.end(response);
   } else {
     res.writeHead(404, { 'Content-Type': 'text/plain' });
     res.end('Not Found');
