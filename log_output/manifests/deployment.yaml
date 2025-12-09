@@ -14,4 +14,4 @@ spec:
     spec:
       containers:
         - name: log-output
-          image: engjuanser/log-output:1.01
+          image: engjuanser/log-output:1.7
