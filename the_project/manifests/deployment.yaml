@@ -12,9 +12,20 @@ spec:
       labels:
         app: todo-app
     spec:
+      volumes:
+        - name: shared-image
+          emptyDir: {}
       containers:
         - name: todo-app
-          image: engjuanser/todo-app:1.5
+          image: engjuanser/todo-app:1.12
           env:
             - name: PORT
               value: "3000"
+          volumeMounts:
+            - name: shared-image
+              mountPath: /usr/src/app/files
+        - name: image-fetcher
+          image: engjuanser/image-fetcher:1.12
+          volumeMounts:
+            - name: shared-image
+              mountPath: /usr/src/app/files
