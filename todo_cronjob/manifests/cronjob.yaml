@@ -1,0 +1,17 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: todo-wiki-cronjob
+  namespace: project
+spec:
+  # Ejecutar cada hora en el minuto 0
+  schedule: "0 * * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: wiki-fetcher
+            image: engjuanser/todo-cronjob:2.9
+            imagePullPolicy: Always
+          restartPolicy: OnFailure
