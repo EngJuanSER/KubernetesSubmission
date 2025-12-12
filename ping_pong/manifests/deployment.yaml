@@ -12,13 +12,6 @@ spec:
       labels:
         app: ping-pong
     spec:
-      volumes:
-        - name: shared-data
-          persistentVolumeClaim:
-            claimName: shared-pvc
       containers:
         - name: ping-pong
-          image: engjuanser/ping-pong:1.11
-          volumeMounts:
-            - name: shared-data
-              mountPath: /usr/src/app/data
+          image: engjuanser/ping-pong:2.1

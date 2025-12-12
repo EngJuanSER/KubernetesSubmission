@@ -15,9 +15,6 @@ spec:
       volumes:
         - name: shared-logs
           emptyDir: {}
-        - name: shared-data
-          persistentVolumeClaim:
-            claimName: shared-pvc
       containers:
         - name: writer
           image: engjuanser/log-output-writer:1.10
@@ -25,9 +22,7 @@ spec:
             - name: shared-logs
               mountPath: /usr/src/app/files
         - name: reader
-          image: engjuanser/log-output-reader:1.11
+          image: engjuanser/log-output-reader:2.1
           volumeMounts:
             - name: shared-logs
               mountPath: /usr/src/app/files
-            - name: shared-data
-              mountPath: /usr/src/app/data

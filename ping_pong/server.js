@@ -27,6 +27,12 @@ const server = http.createServer((req, res) => {
     console.log(`Pong ${counter}`);
     res.writeHead(200, { 'Content-Type': 'text/plain' });
     res.end(`pong ${counter}\n`);
+    
+  } else if (req.url === '/pings' && req.method === 'GET') {
+    // Nuevo endpoint para que otros pods obtengan el contador
+    res.writeHead(200, { 'Content-Type': 'text/plain' });
+    res.end(counter.toString());
+    
   } else {
     res.writeHead(404, { 'Content-Type': 'text/plain' });
     res.end('Not Found\n');
@@ -35,4 +41,5 @@ const server = http.createServer((req, res) => {
 
 server.listen(PORT, () => {
   console.log(`Ping-pong server listening on port ${PORT}`);
+  console.log('Endpoints: /pingpong, /pings');
 });

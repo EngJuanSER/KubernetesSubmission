@@ -3,9 +3,27 @@ const fs = require('fs');
 
 const PORT = 3000;
 const logFile = '/usr/src/app/files/log.txt';
-const counterFile = '/usr/src/app/data/counter.txt';
+const PING_PONG_URL = 'http://ping-pong-svc:3000/pings';
 
-const server = http.createServer((req, res) => {
+// Función para hacer GET request interno
+const getPingCount = () => {
+  return new Promise((resolve, reject) => {
+    http.get(PING_PONG_URL, (response) => {
+      let data = '';
+      response.on('data', (chunk) => {
+        data += chunk;
+      });
+      response.on('end', () => {
+        resolve(data.trim());
+      });
+    }).on('error', (err) => {
+      console.error('Error fetching ping count:', err);
+      reject(err);
+    });
+  });
+};
+
+const server = http.createServer(async (req, res) => {
   if (req.url === '/' && req.method === 'GET') {
     let output = '';
     
@@ -17,11 +35,12 @@ const server = http.createServer((req, res) => {
       output = 'Log file not found yet';
     }
     
-    // Leer contador desde el volumen persistente
+    // Obtener contador via HTTP
     let counter = 0;
-    if (fs.existsSync(counterFile)) {
-      const content = fs.readFileSync(counterFile, 'utf-8').trim();
-      counter = parseInt(content) || 0;
+    try {
+      counter = await getPingCount();
+    } catch (err) {
+      console.error('Failed to get ping count');
     }
     
     const response = `${output}\nPing / Pongs: ${counter}\n`;
