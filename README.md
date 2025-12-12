@@ -22,6 +22,7 @@ This repository contains my submissions for the [DevOps with Kubernetes](https:/
 
 ### Part 2
 
+- [2.1.](https://github.com/EngJuanSER/KubernetesSubmission/tree/2.1) Connect log-output and ping-pong with HTTP
 
 ### Part 3
 
