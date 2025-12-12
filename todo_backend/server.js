@@ -1,7 +1,9 @@
 const http = require('http');
 const url = require('url');
 
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
+
+console.log(`Starting todo-backend on port ${PORT}`);
 
 // Almacenamiento en memoria
 let todos = [];

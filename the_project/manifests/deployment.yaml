@@ -18,15 +18,18 @@ spec:
           emptyDir: {}
       containers:
         - name: todo-app
-          image: engjuanser/todo-app:2.2
-          env:
-            - name: PORT
-              value: "3000"
+          image: engjuanser/todo-app:2.6
+          envFrom:
+            - configMapRef:
+                name: todo-project-config
           volumeMounts:
             - name: shared-image
               mountPath: /usr/src/app/files
         - name: image-fetcher
-          image: engjuanser/image-fetcher:1.12
+          image: engjuanser/image-fetcher:2.6
+          envFrom:
+            - configMapRef:
+                name: todo-project-config
           volumeMounts:
             - name: shared-image
               mountPath: /usr/src/app/files

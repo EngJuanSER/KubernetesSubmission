@@ -2,9 +2,14 @@ const https = require('https');
 const fs = require('fs');
 const path = require('path');
 
-const IMAGE_URL = 'https://picsum.photos/1200';
+const IMAGE_URL = process.env.IMAGE_URL || 'https://picsum.photos/1200';
 const IMAGE_PATH = '/usr/src/app/files/image.jpg';
-const CACHE_TIME = 60 * 60 * 1000; // 1 hour in milliseconds
+const CACHE_TIME = parseInt(process.env.IMAGE_UPDATE_INTERVAL) || 60 * 60 * 1000; // Default: 1 hour in milliseconds
+
+console.log(`Image fetcher configuration:`);
+console.log(`- Image URL: ${IMAGE_URL}`);
+console.log(`- Cache time: ${CACHE_TIME}ms (${CACHE_TIME / 60000} minutes)`);
+console.log(`- Image path: ${IMAGE_PATH}`);
 
 function downloadImage() {
   console.log(`${new Date().toISOString()} - Downloading new image...`);

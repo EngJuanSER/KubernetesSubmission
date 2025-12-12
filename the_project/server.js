@@ -4,7 +4,10 @@ const fs = require('fs');
 
 const PORT = process.env.PORT || 3000;
 const IMAGE_PATH = '/usr/src/app/files/image.jpg';
-const BACKEND_URL = 'http://todo-backend-svc:3000';
+const BACKEND_URL = process.env.BACKEND_URL || 'http://todo-backend-svc:3000';
+
+console.log(`Starting todo-app on port ${PORT}`);
+console.log(`Backend URL: ${BACKEND_URL}`);
 
 // Función para hacer GET request al backend
 const getTodos = () => {
