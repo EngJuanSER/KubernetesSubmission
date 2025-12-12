@@ -1,123 +1,232 @@
 const http = require('http');
+const url = require('url');
 const fs = require('fs');
-const path = require('path');
 
 const PORT = process.env.PORT || 3000;
 const IMAGE_PATH = '/usr/src/app/files/image.jpg';
+const BACKEND_URL = 'http://todo-backend-svc:3000';
 
-// Hardcoded todos for exercise 1.13
-const todos = [
-  'TODO 1',
-  'TODO 2'
-];
+// Función para hacer GET request al backend
+const getTodos = () => {
+  return new Promise((resolve, reject) => {
+    http.get(`${BACKEND_URL}/todos`, (response) => {
+      let data = '';
+      response.on('data', (chunk) => {
+        data += chunk;
+      });
+      response.on('end', () => {
+        try {
+          resolve(JSON.parse(data));
+        } catch (err) {
+          resolve([]);
+        }
+      });
+    }).on('error', (err) => {
+      console.error('Error fetching todos:', err);
+      resolve([]);
+    });
+  });
+};
 
-const server = http.createServer((req, res) => {
-  if (req.url === '/' && req.method === 'GET') {
-    res.writeHead(200, { 'Content-Type': 'text/html' });
-    const todoList = todos.map(todo => `<li>${todo}</li>`).join('');
-    const html = `
+// Función para hacer POST request al backend
+const createTodo = (todoText) => {
+  return new Promise((resolve, reject) => {
+    const postData = JSON.stringify({ text: todoText });
+    
+    const options = {
+      hostname: 'todo-backend-svc',
+      port: 3000,
+      path: '/todos',
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Content-Length': Buffer.byteLength(postData)
+      }
+    };
+    
+    const req = http.request(options, (response) => {
+      let data = '';
+      response.on('data', (chunk) => {
+        data += chunk;
+      });
+      response.on('end', () => {
+        resolve(data);
+      });
+    });
+    
+    req.on('error', (err) => {
+      console.error('Error creating todo:', err);
+      reject(err);
+    });
+    
+    req.write(postData);
+    req.end();
+  });
+};
+
+const server = http.createServer(async (req, res) => {
+  const parsedUrl = url.parse(req.url, true);
+  const pathname = parsedUrl.pathname;
+  
+  if (pathname === '/' && req.method === 'GET') {
+    // Obtener todos del backend
+    const todos = await getTodos();
+    
+    let html = `
       <!DOCTYPE html>
       <html>
-        <head>
-          <title>Todo App</title>
-          <style>
-            body {
-              font-family: Arial, sans-serif;
-              max-width: 800px;
-              margin: 0 auto;
-              padding: 20px;
-              background-color: #f5f5f5;
-            }
-            .container {
-              background-color: white;
-              padding: 30px;
-              border-radius: 10px;
-              box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            }
-            h1 {
-              color: #333;
-              margin-top: 0;
-            }
-            img {
-              max-width: 100%;
-              height: auto;
-              border-radius: 8px;
-              margin: 20px 0;
-            }
-            form {
-              margin: 20px 0;
-              display: flex;
-              gap: 10px;
-            }
-            input[type="text"] {
-              flex: 1;
-              padding: 10px;
-              border: 2px solid #ddd;
-              border-radius: 5px;
-              font-size: 16px;
-            }
-            button {
-              padding: 10px 20px;
-              background-color: #4CAF50;
-              color: white;
-              border: none;
-              border-radius: 5px;
-              font-size: 16px;
-              cursor: pointer;
-            }
-            button:hover {
-              background-color: #45a049;
-            }
-            ul {
-              list-style-type: none;
-              padding: 0;
-            }
-            li {
-              background-color: #f9f9f9;
-              margin: 10px 0;
-              padding: 15px;
-              border-left: 4px solid #4CAF50;
-              border-radius: 4px;
-            }
-          </style>
-        </head>
-        <body>
-          <div class="container">
-            <h1>Todo App</h1>
-            <img src="/image" alt="Random daily image">
-            
-            <form action="/" method="POST">
-              <input type="text" name="todo" maxlength="140" placeholder="Enter a new todo (max 140 characters)" required>
-              <button type="submit">Create TODO</button>
-            </form>
-            
-            <h2>My TODOs:</h2>
-            <ul>
-              ${todoList}
-            </ul>
-          </div>
-        </body>
+      <head>
+        <title>Todo App</title>
+        <style>
+          body { 
+            font-family: Arial, sans-serif; 
+            max-width: 800px; 
+            margin: 0 auto; 
+            padding: 20px; 
+            background-color: #f5f5f5;
+          }
+          img { 
+            max-width: 100%; 
+            height: auto; 
+            margin-bottom: 20px; 
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+          }
+          h1 { 
+            color: #333; 
+            border-bottom: 2px solid #007bff;
+            padding-bottom: 10px;
+          }
+          h2 { 
+            color: #555; 
+            margin-top: 30px;
+          }
+          input { 
+            width: 300px; 
+            padding: 10px; 
+            font-size: 14px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+          }
+          button { 
+            padding: 10px 20px; 
+            margin-left: 10px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+          }
+          button:hover {
+            background-color: #0056b3;
+          }
+          ul { 
+            list-style-type: none; 
+            padding: 0; 
+          }
+          li { 
+            padding: 12px; 
+            border-bottom: 1px solid #ddd;
+            background-color: white;
+            margin-bottom: 5px;
+            border-radius: 4px;
+          }
+          .form-container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+          }
+          .todos-container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+          }
+        </style>
+      </head>
+      <body>
+        <h1>Todo App</h1>
+    `;
+    
+    // Mostrar imagen si existe
+    if (fs.existsSync(IMAGE_PATH)) {
+      html += '<img src="/image" alt="Random image from Lorem Picsum">';
+    }
+    
+    html += `
+        <div class="form-container">
+          <h2>Add Todo</h2>
+          <form action="/" method="post">
+            <input 
+              type="text" 
+              name="content" 
+              maxlength="140" 
+              placeholder="Enter todo (max 140 chars)" 
+              required
+            />
+            <button type="submit">Create Todo</button>
+          </form>
+        </div>
+        
+        <div class="todos-container">
+          <h2>Todos</h2>
+          <ul>
+    `;
+    
+    // Renderizar todos del backend
+    if (todos.length === 0) {
+      html += '<li>No todos yet. Create one above!</li>';
+    } else {
+      todos.forEach(todo => {
+        html += `<li>${todo.text}</li>`;
+      });
+    }
+    
+    html += `
+          </ul>
+        </div>
+      </body>
       </html>
     `;
+    
+    res.writeHead(200, { 'Content-Type': 'text/html' });
     res.end(html);
-  } else if (req.url === '/' && req.method === 'POST') {
-    // For now, just redirect back to GET
-    // We'll handle form submission properly in a later exercise
-    res.writeHead(303, { 'Location': '/' });
-    res.end();
-  } else if (req.url === '/image' && req.method === 'GET') {
+    
+  } else if (pathname === '/' && req.method === 'POST') {
+    // Manejar formulario POST
+    let body = '';
+    
+    req.on('data', chunk => {
+      body += chunk.toString();
+    });
+    
+    req.on('end', async () => {
+      // Parsear form data (application/x-www-form-urlencoded)
+      const params = new URLSearchParams(body);
+      const todoText = params.get('content');
+      
+      if (todoText) {
+        await createTodo(todoText);
+      }
+      
+      // Redirect back to home
+      res.writeHead(302, { 'Location': '/' });
+      res.end();
+    });
+    
+  } else if (pathname === '/image' && req.method === 'GET') {
     if (fs.existsSync(IMAGE_PATH)) {
-      const stat = fs.statSync(IMAGE_PATH);
-      res.writeHead(200, {
-        'Content-Type': 'image/jpeg',
-        'Content-Length': stat.size
-      });
-      const readStream = fs.createReadStream(IMAGE_PATH);
-      readStream.pipe(res);
+      const img = fs.readFileSync(IMAGE_PATH);
+      res.writeHead(200, { 'Content-Type': 'image/jpeg' });
+      res.end(img);
     } else {
       res.writeHead(404, { 'Content-Type': 'text/plain' });
-      res.end('Image not found yet');
+      res.end('Image not found');
     }
+    
   } else {
     res.writeHead(404, { 'Content-Type': 'text/plain' });
     res.end('Not Found');
