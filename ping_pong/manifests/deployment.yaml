@@ -15,4 +15,15 @@ spec:
     spec:
       containers:
         - name: ping-pong
-          image: engjuanser/ping-pong:2.1
+          image: engjuanser/ping-pong:2.7
+          env:
+            - name: PORT
+              value: "3000"
+            - name: POSTGRES_HOST
+              value: "postgres-svc.exercises"
+            - name: POSTGRES_DB
+              value: "pingpongdb"
+            - name: POSTGRES_USER
+              value: "postgres"
+            - name: POSTGRES_PASSWORD
+              value: "postgres"
