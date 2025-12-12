@@ -24,6 +24,7 @@ This repository contains my submissions for the [DevOps with Kubernetes](https:/
 
 - [2.1.](https://github.com/EngJuanSER/KubernetesSubmission/tree/2.1) Connect log-output and ping-pong with HTTP
 - [2.2.](https://github.com/EngJuanSER/KubernetesSubmission/tree/2.2) Separate backend service for todo management
+- [2.3.](https://github.com/EngJuanSER/KubernetesSubmission/tree/2.3) Move log-output and ping-pong to exercises namespace
 
 ### Part 3
 
