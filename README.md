@@ -31,6 +31,7 @@ This repository contains my submissions for the [DevOps with Kubernetes](https:/
 - [2.7.](https://github.com/EngJuanSER/KubernetesSubmission/tree/2.7) Use Postgres StatefulSet for ping-pong counter
 - [2.8.](https://github.com/EngJuanSER/KubernetesSubmission/tree/2.8) Use Postgres StatefulSet for todo data persistence
 - [2.9.](https://github.com/EngJuanSER/KubernetesSubmission/tree/2.9) Create CronJob to add random Wikipedia article as todo hourly
+- [2.10.](https://github.com/EngJuanSER/KubernetesSubmission/tree/2.10) Add monitoring with Prometheus, Grafana and Loki
 
 ### Part 3
 
