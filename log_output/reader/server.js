@@ -3,7 +3,9 @@ const fs = require('fs');
 
 const PORT = 3000;
 const logFile = '/usr/src/app/files/log.txt';
-const PING_PONG_URL = 'http://ping-pong-svc:3000/pings';
+const configFile = '/usr/src/app/config/information.txt';
+const PING_PONG_URL = 'http://ping-pong-svc.exercises:3000/pings';
+const MESSAGE = process.env.MESSAGE || 'no message';
 
 // Función para hacer GET request interno
 const getPingCount = () => {
@@ -27,6 +29,12 @@ const server = http.createServer(async (req, res) => {
   if (req.url === '/' && req.method === 'GET') {
     let output = '';
     
+    // Leer contenido del archivo de configuración
+    let fileContent = 'file not found';
+    if (fs.existsSync(configFile)) {
+      fileContent = fs.readFileSync(configFile, 'utf-8').trim();
+    }
+    
     // Leer última línea del log
     if (fs.existsSync(logFile)) {
       const lines = fs.readFileSync(logFile, 'utf-8').trim().split('\n');
@@ -43,7 +51,7 @@ const server = http.createServer(async (req, res) => {
       console.error('Failed to get ping count');
     }
     
-    const response = `${output}\nPing / Pongs: ${counter}\n`;
+    const response = `file content: ${fileContent}\nenv variable: MESSAGE=${MESSAGE}\n${output}\nPing / Pongs: ${counter}`;
     
     res.writeHead(200, { 'Content-Type': 'text/plain' });
     res.end(response);
