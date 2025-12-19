@@ -61,6 +61,13 @@ const server = http.createServer(async (req, res) => {
     return;
   }
   
+  // Health check endpoint for Ingress
+  if (pathname === '/' && method === 'GET') {
+    res.writeHead(200, { 'Content-Type': 'text/plain' });
+    res.end('Todo backend is healthy\n');
+    return;
+  }
+  
   if (pathname === '/todos' && method === 'GET') {
     try {
       // GET /todos - Devolver lista de todos

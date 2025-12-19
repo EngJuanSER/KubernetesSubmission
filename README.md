@@ -39,6 +39,7 @@ This repository contains my submissions for the [DevOps with Kubernetes](https:/
 - [3.2.](https://github.com/EngJuanSER/KubernetesSubmission/tree/3.2) Deploy Log-output and Ping-pong with Ingress on GKE
 - [3.3.](https://github.com/EngJuanSER/KubernetesSubmission/tree/3.3) Migrate from Ingress to Gateway API
 - [3.4.](https://github.com/EngJuanSER/KubernetesSubmission/tree/3.4) URL rewriting with Gateway API
+- [3.5.](https://github.com/EngJuanSER/KubernetesSubmission/tree/3.5) Configure todo project with Kustomize for GKE
 
 ### Part 4
 
