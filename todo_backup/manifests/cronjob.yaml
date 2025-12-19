@@ -10,8 +10,6 @@ spec:
       template:
         spec:
           restartPolicy: Never
-          nodeSelector:
-            cloud.google.com/gke-nodepool: backup-pool
           containers:
           - name: backup
             image: engjuanser/todo-backup:1.0
