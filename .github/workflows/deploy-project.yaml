@@ -1,0 +1,94 @@
+name: Deploy Todo Project to GKE
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'todo_project/**'
+      - 'the_project/**'
+      - 'todo_backend/**'
+      - '.github/workflows/deploy-project.yaml'
+
+env:
+  PROJECT_ID: devopskub
+  GKE_CLUSTER: dwk-cluster
+  GKE_ZONE: europe-north1-b
+  REGISTRY: europe-north1-docker.pkg.dev
+  REPOSITORY: todo-app
+  FRONTEND_IMAGE: todo-frontend
+  BACKEND_IMAGE: todo-backend
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  build-publish-deploy:
+    name: Build, Publish and Deploy
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: 'projects/201464626114/locations/global/workloadIdentityPools/github-pool/providers/github-provider'
+          service_account: 'github-actions@devopskub.iam.gserviceaccount.com'
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+
+      - name: Get GKE credentials
+        uses: google-github-actions/get-gke-credentials@v2
+        with:
+          cluster_name: ${{ env.GKE_CLUSTER }}
+          location: ${{ env.GKE_ZONE }}
+
+      - name: Configure Docker for Artifact Registry
+        run: gcloud auth configure-docker ${{ env.REGISTRY }}
+
+      - name: Build Frontend Image
+        run: |
+          docker build \
+            -t ${{ env.REGISTRY }}/${{ env.PROJECT_ID }}/${{ env.REPOSITORY }}/${{ env.FRONTEND_IMAGE }}:${GITHUB_SHA::7} \
+            -t ${{ env.REGISTRY }}/${{ env.PROJECT_ID }}/${{ env.REPOSITORY }}/${{ env.FRONTEND_IMAGE }}:latest \
+            ./the_project
+
+      - name: Push Frontend Image
+        run: |
+          docker push ${{ env.REGISTRY }}/${{ env.PROJECT_ID }}/${{ env.REPOSITORY }}/${{ env.FRONTEND_IMAGE }}:${GITHUB_SHA::7}
+          docker push ${{ env.REGISTRY }}/${{ env.PROJECT_ID }}/${{ env.REPOSITORY }}/${{ env.FRONTEND_IMAGE }}:latest
+
+      - name: Build Backend Image
+        run: |
+          docker build \
+            -t ${{ env.REGISTRY }}/${{ env.PROJECT_ID }}/${{ env.REPOSITORY }}/${{ env.BACKEND_IMAGE }}:${GITHUB_SHA::7} \
+            -t ${{ env.REGISTRY }}/${{ env.PROJECT_ID }}/${{ env.REPOSITORY }}/${{ env.BACKEND_IMAGE }}:latest \
+            ./todo_backend
+
+      - name: Push Backend Image
+        run: |
+          docker push ${{ env.REGISTRY }}/${{ env.PROJECT_ID }}/${{ env.REPOSITORY }}/${{ env.BACKEND_IMAGE }}:${GITHUB_SHA::7}
+          docker push ${{ env.REGISTRY }}/${{ env.PROJECT_ID }}/${{ env.REPOSITORY }}/${{ env.BACKEND_IMAGE }}:latest
+
+      - name: Set up Kustomize
+        uses: imranismail/setup-kustomize@v2
+
+      - name: Deploy to GKE
+        working-directory: ./todo_project
+        run: |
+          kustomize edit set image \
+            PROJECT/FRONTEND=${{ env.REGISTRY }}/${{ env.PROJECT_ID }}/${{ env.REPOSITORY }}/${{ env.FRONTEND_IMAGE }}:${GITHUB_SHA::7}
+          kustomize edit set image \
+            PROJECT/BACKEND=${{ env.REGISTRY }}/${{ env.PROJECT_ID }}/${{ env.REPOSITORY }}/${{ env.BACKEND_IMAGE }}:${GITHUB_SHA::7}
+          
+          kustomize build . | kubectl apply -f -
+          
+          kubectl rollout status deployment/todo-frontend -n project
+          kubectl rollout status deployment/todo-backend -n project
+          
+          kubectl get services -n project -o wide
+          kubectl get ingress -n project

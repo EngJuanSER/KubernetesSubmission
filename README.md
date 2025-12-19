@@ -40,6 +40,7 @@ This repository contains my submissions for the [DevOps with Kubernetes](https:/
 - [3.3.](https://github.com/EngJuanSER/KubernetesSubmission/tree/3.3) Migrate from Ingress to Gateway API
 - [3.4.](https://github.com/EngJuanSER/KubernetesSubmission/tree/3.4) URL rewriting with Gateway API
 - [3.5.](https://github.com/EngJuanSER/KubernetesSubmission/tree/3.5) Configure todo project with Kustomize for GKE
+- [3.6.](https://github.com/EngJuanSER/KubernetesSubmission/tree/3.6) Automatic deployment with GitHub Actions
 
 ### Part 4
 
