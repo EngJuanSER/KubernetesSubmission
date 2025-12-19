@@ -44,6 +44,7 @@ This repository contains my submissions for the [DevOps with Kubernetes](https:/
 - [3.7.](https://github.com/EngJuanSER/KubernetesSubmission/tree/3.7) Separate environment per branch
 - [3.8.](https://github.com/EngJuanSER/KubernetesSubmission/tree/3.8) Automatic cleanup when branch is deleted
 - [3.9.](https://github.com/EngJuanSER/KubernetesSubmission/tree/3.9) DBaaS vs DIY analysis
+- [3.10.](https://github.com/EngJuanSER/KubernetesSubmission/tree/3.10) Automated database backups to Google Cloud Storage
 
 ## Exercise 3.9: DBaaS vs DIY Analysis
 
