@@ -35,6 +35,7 @@ This repository contains my submissions for the [DevOps with Kubernetes](https:/
 
 ### Part 3
 
+- [3.1.](https://github.com/EngJuanSER/KubernetesSubmission/tree/3.1) Deploy Ping-pong to GKE with LoadBalancer service
 
 ### Part 4
 

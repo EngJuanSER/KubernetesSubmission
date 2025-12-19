@@ -51,7 +51,7 @@ spec:
         name: postgres-data
       spec:
         accessModes: ["ReadWriteOnce"]
-        storageClassName: local-path
+        # NO especificar storageClassName para usar dynamic provisioning de GKE
         resources:
           requests:
             storage: 100Mi
