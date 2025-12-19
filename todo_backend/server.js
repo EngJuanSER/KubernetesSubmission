@@ -4,6 +4,17 @@ const { Pool } = require('pg');
 
 const PORT = process.env.PORT || 3000;
 
+// Función para logs estructurados en formato JSON
+const log = (level, message, metadata = {}) => {
+  const logEntry = {
+    timestamp: new Date().toISOString(),
+    severity: level.toUpperCase(),
+    message,
+    ...metadata
+  };
+  console.log(JSON.stringify(logEntry));
+};
+
 // Configuración de Postgres
 const pool = new Pool({
   host: process.env.POSTGRES_HOST || 'postgres-svc.project',
@@ -13,10 +24,8 @@ const pool = new Pool({
   password: process.env.POSTGRES_PASSWORD || 'postgres',
 });
 
-console.log(`=================================`);
-console.log(`Starting todo-backend on port ${PORT}`);
-console.log(`=================================`);
-console.log('Connecting to Postgres...');
+log('info', 'Starting todo-backend', { port: PORT });
+log('info', 'Connecting to Postgres', { host: process.env.POSTGRES_HOST });
 
 // Inicializar la base de datos
 const initDB = async () => {
@@ -29,9 +38,9 @@ const initDB = async () => {
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       )
     `);
-    console.log('✓ Database initialized successfully');
+    log('info', 'Database initialized successfully');
   } catch (err) {
-    console.error('✗ Error initializing database:', err);
+    log('error', 'Error initializing database', { error: err.message, stack: err.stack });
     process.exit(1);
   }
 };
@@ -39,9 +48,14 @@ const initDB = async () => {
 initDB();
 
 // Función helper para logging de requests
-const logRequest = (method, path, statusCode, message = '') => {
-  const timestamp = new Date().toISOString();
-  console.log(`[${timestamp}] ${method} ${path} - Status: ${statusCode}${message ? ' - ' + message : ''}`);
+const logRequest = (method, path, statusCode, message = '', metadata = {}) => {
+  log('info', 'HTTP Request', {
+    method,
+    path,
+    statusCode,
+    message,
+    ...metadata
+  });
 };
 
 const server = http.createServer(async (req, res) => {
@@ -132,13 +146,16 @@ const server = http.createServer(async (req, res) => {
         );
         
         const newTodo = result.rows[0];
-        console.log(`✓ New todo created (ID: ${newTodo.id}): "${newTodo.text.substring(0, 50)}${newTodo.text.length > 50 ? '...' : ''}"`);
-        logRequest(method, pathname, 201, `Created todo ID: ${newTodo.id}`);
+        log('info', 'Todo created', { 
+          todoId: newTodo.id, 
+          text: newTodo.text.substring(0, 50) + (newTodo.text.length > 50 ? '...' : '')
+        });
+        logRequest(method, pathname, 201, `Created todo ID: ${newTodo.id}`, { todoId: newTodo.id });
         
         res.writeHead(201, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify(newTodo));
       } catch (err) {
-        console.error('✗ Error creating todo:', err);
+        log('error', 'Error creating todo', { error: err.message, stack: err.stack });
         logRequest(method, pathname, 400, 'Bad Request');
         
         res.writeHead(400, { 'Content-Type': 'application/json' });
@@ -154,11 +171,12 @@ const server = http.createServer(async (req, res) => {
 });
 
 server.listen(PORT, () => {
-  console.log(`=================================`);
-  console.log(`✓ Todo-backend listening on port ${PORT}`);
-  console.log(`Endpoints:`);
-  console.log(`  - GET  /todos`);
-  console.log(`  - POST /todos`);
-  console.log(`=================================`);
+  log('info', 'Todo-backend server started', {
+    port: PORT,
+    endpoints: [
+      { method: 'GET', path: '/todos' },
+      { method: 'POST', path: '/todos' }
+    ]
+  });
 });
 

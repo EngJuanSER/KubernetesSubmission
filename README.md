@@ -46,6 +46,7 @@ This repository contains my submissions for the [DevOps with Kubernetes](https:/
 - [3.9.](https://github.com/EngJuanSER/KubernetesSubmission/tree/3.9) DBaaS vs DIY analysis
 - [3.10.](https://github.com/EngJuanSER/KubernetesSubmission/tree/3.10) Automated database backups to Google Cloud Storage
 - [3.11.](https://github.com/EngJuanSER/KubernetesSubmission/tree/3.11) Resource requests and limits
+- [3.12.](https://github.com/EngJuanSER/KubernetesSubmission/tree/3.12) Structured logging for Google Cloud Logging
 
 ## Exercise 3.9: DBaaS vs DIY Analysis
 
