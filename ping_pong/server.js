@@ -41,12 +41,8 @@ const initDB = async () => {
 initDB();
 
 const server = http.createServer(async (req, res) => {
-  // Health check endpoint for Ingress
+  // Main counter endpoint (for Gateway with URL rewriting)
   if (req.url === '/' && req.method === 'GET') {
-    res.writeHead(200, { 'Content-Type': 'text/plain' });
-    res.end('Ping-pong service is healthy\n');
-    
-  } else if (req.url === '/pingpong' && req.method === 'GET') {
     try {
       // Incrementar contador
       await pool.query('UPDATE pongs SET count = count + 1 WHERE id = 1');
@@ -87,5 +83,5 @@ const server = http.createServer(async (req, res) => {
 
 server.listen(PORT, () => {
   console.log(`Ping-pong server listening on port ${PORT}`);
-  console.log('Endpoints: /pingpong, /pings');
+  console.log('Endpoints: / (counter), /pings (get counter)');
 });
