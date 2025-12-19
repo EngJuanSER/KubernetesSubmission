@@ -5,7 +5,7 @@ metadata:
   namespace: project
 data:
   PORT: "3000"
-  BACKEND_URL: "http://todo-backend-svc.project:3000"
+  BACKEND_URL: "http://todo-backend-svc:3000"
   IMAGE_URL: "https://picsum.photos/1200"
   IMAGE_UPDATE_INTERVAL: "3600000"
-  POSTGRES_HOST: "postgres-svc.project"
+  POSTGRES_HOST: "postgres-svc"
