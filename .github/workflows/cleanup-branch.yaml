@@ -1,0 +1,85 @@
+name: Cleanup Branch Environment
+
+on:
+  delete:
+    branches:
+      - '*'
+
+env:
+  PROJECT_ID: devopskub
+  GKE_CLUSTER: dwk-cluster
+  GKE_ZONE: europe-north1-b
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  cleanup:
+    name: Delete Branch Environment
+    runs-on: ubuntu-latest
+    if: github.event.ref != 'main' && github.event.ref != 'master'
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: 'projects/201464626114/locations/global/workloadIdentityPools/github-pool/providers/github-provider'
+          service_account: 'github-actions@devopskub.iam.gserviceaccount.com'
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+
+      - name: Get GKE credentials
+        uses: google-github-actions/get-gke-credentials@v2
+        with:
+          cluster_name: ${{ env.GKE_CLUSTER }}
+          location: ${{ env.GKE_ZONE }}
+
+      - name: Show namespace resources before deletion
+        run: |
+          BRANCH_NAME=${{ github.event.ref }}
+          echo "======================================"
+          echo "Resources in namespace: $BRANCH_NAME"
+          echo "======================================"
+          
+          if kubectl get namespace $BRANCH_NAME > /dev/null 2>&1; then
+            echo "Pods:"
+            kubectl get pods -n $BRANCH_NAME || echo "No pods"
+            echo ""
+            echo "Services:"
+            kubectl get svc -n $BRANCH_NAME || echo "No services"
+            echo ""
+            echo "Ingress:"
+            kubectl get ingress -n $BRANCH_NAME || echo "No ingress"
+          else
+            echo "Namespace $BRANCH_NAME does not exist"
+          fi
+
+      - name: Delete namespace
+        run: |
+          BRANCH_NAME=${{ github.event.ref }}
+          echo "======================================"
+          echo "Deleting namespace: $BRANCH_NAME"
+          echo "======================================"
+          
+          if kubectl get namespace $BRANCH_NAME > /dev/null 2>&1; then
+            kubectl delete namespace $BRANCH_NAME --wait=true
+            echo "Namespace $BRANCH_NAME deleted successfully"
+          else
+            echo "Namespace $BRANCH_NAME does not exist, nothing to delete"
+          fi
+
+      - name: Verify deletion
+        run: |
+          BRANCH_NAME=${{ github.event.ref }}
+          
+          if kubectl get namespace $BRANCH_NAME > /dev/null 2>&1; then
+            echo "ERROR: Namespace $BRANCH_NAME still exists!"
+            exit 1
+          else
+            echo "SUCCESS: Namespace $BRANCH_NAME has been deleted"
+          fi
