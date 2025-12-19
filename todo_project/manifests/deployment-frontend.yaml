@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: todo-frontend
+  namespace: project
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: todo-frontend
+  template:
+    metadata:
+      labels:
+        app: todo-frontend
+    spec:
+      volumes:
+        - name: shared-image
+          persistentVolumeClaim:
+            claimName: image-claim
+      containers:
+        - name: image-fetcher
+          image: engjuanser/image-fetcher:2.6
+          volumeMounts:
+            - name: shared-image
+              mountPath: /usr/src/app/files
+          envFrom:
+            - configMapRef:
+                name: todo-project-config
+        - name: todo-frontend
+          image: PROJECT/FRONTEND
+          volumeMounts:
+            - name: shared-image
+              mountPath: /usr/src/app/files
+          envFrom:
+            - configMapRef:
+                name: todo-project-config

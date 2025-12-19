@@ -1,0 +1,23 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: project
+
+resources:
+  - manifests/configmap.yaml
+  - manifests/secret.yaml
+  - manifests/persistentvolumeclaim.yaml
+  - manifests/statefulset-postgres.yaml
+  - manifests/deployment-backend.yaml
+  - manifests/deployment-frontend.yaml
+  - manifests/service-backend.yaml
+  - manifests/service-frontend.yaml
+  - manifests/ingress.yaml
+
+images:
+  - name: PROJECT/FRONTEND
+    newName: engjuanser/todo-app
+    newTag: "2.6"
+  - name: PROJECT/BACKEND
+    newName: engjuanser/todo-backend
+    newTag: "2.8"
