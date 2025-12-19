@@ -43,6 +43,92 @@ This repository contains my submissions for the [DevOps with Kubernetes](https:/
 - [3.6.](https://github.com/EngJuanSER/KubernetesSubmission/tree/3.6) Automatic deployment with GitHub Actions
 - [3.7.](https://github.com/EngJuanSER/KubernetesSubmission/tree/3.7) Separate environment per branch
 - [3.8.](https://github.com/EngJuanSER/KubernetesSubmission/tree/3.8) Automatic cleanup when branch is deleted
+- [3.9.](https://github.com/EngJuanSER/KubernetesSubmission/tree/3.9) DBaaS vs DIY analysis
+
+## Exercise 3.9: DBaaS vs DIY Analysis
+
+### Comparison Summary
+
+| Aspect | Cloud SQL (DBaaS) | Postgres in K8s (DIY) |
+|--------|-------------------|----------------------|
+| **Setup Time** | 5-10 minutes | 1-2 hours |
+| **Monthly Cost** | $50-200+ | $0.60 + engineering time |
+| **Maintenance** | 1-2 hours/month | 10-20 hours/month |
+| **Backups** | Automatic daily | Manual setup required |
+| **HA** | Built-in failover | Complex to implement |
+| **SLA** | 99.95% | None |
+| **Control** | Limited | Full |
+| **Vendor Lock-in** | Yes | No |
+
+### Cloud SQL (DBaaS) - Pros & Cons
+
+**Pros:**
+- Automatic backups with point-in-time recovery (7 days)
+- Automated updates and security patches
+- Built-in high availability and failover
+- Easy scaling with minimal downtime
+- Integrated monitoring and alerting
+- 99.95% SLA guarantee
+
+**Cons:**
+- Higher costs ($50-200/month for small production)
+- Vendor lock-in to Google Cloud
+- Limited customization options
+- Potential latency (requires Cloud SQL Proxy or Private IP)
+
+### Postgres in Kubernetes (DIY) - Pros & Cons
+
+**Pros:**
+- Full control over configuration
+- Lower direct costs (~$0.60/month for storage)
+- No vendor lock-in, portable between clouds
+- Minimal network latency (same cluster)
+- Valuable learning experience
+
+**Cons:**
+- Complex initial setup (StatefulSets, PVCs, Secrets)
+- Manual backup implementation required
+- No automated failover or HA
+- Requires database administration expertise
+- Risk of data loss from human error
+- No SLA guarantees
+
+### Backup Comparison
+
+| Feature | Cloud SQL | DIY |
+|---------|-----------|-----|
+| Automation | Daily | Need CronJob |
+| Point-in-time recovery | 7 days | Manual |
+| Storage management | Automatic | Manual (GCS) |
+| Restore process | One-click | Complex |
+
+### Cost Analysis
+
+**Cloud SQL (db-n1-standard-1):**
+- Instance: ~$50/month
+- Storage (10GB): ~$1.70/month
+- **Total: ~$52/month**
+
+**DIY Postgres:**
+- GKE storage (10GB PV): ~$0.40/month
+- Backup storage (GCS): ~$0.20/month
+- **Total: ~$0.60/month**
+
+**Hidden DIY cost:** Engineering time (10-20 hours/month) = $500-1000/month opportunity cost
+
+### Recommendation
+
+**For this educational project:** DIY (Postgres in K8s)
+- Learning opportunity
+- Minimal budget
+- No real users
+- Acceptable downtime
+
+**For production:** Cloud SQL
+- Reliability critical
+- Automatic disaster recovery
+- Professional support
+- Worth the cost for peace of mind
 
 ### Part 4
 
