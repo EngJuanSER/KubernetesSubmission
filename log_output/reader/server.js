@@ -7,6 +7,8 @@ const configFile = '/usr/src/app/config/information.txt';
 const PING_PONG_URL = 'http://ping-pong-svc.exercises:3000/pings';
 const MESSAGE = process.env.MESSAGE || 'no message';
 
+let pingpongAvailable = false;
+
 // Función para hacer GET request interno
 const getPingCount = () => {
   return new Promise((resolve, reject) => {
@@ -25,7 +27,37 @@ const getPingCount = () => {
   });
 };
 
+// Check ping-pong availability
+const checkPingpong = async () => {
+  try {
+    await getPingCount();
+    pingpongAvailable = true;
+    console.log('Ping-pong connection successful');
+  } catch (err) {
+    pingpongAvailable = false;
+    console.log('Ping-pong not available:', err.message);
+  }
+};
+
+// Initial check
+checkPingpong();
+
+// Check every 5 seconds
+setInterval(checkPingpong, 5000);
+
 const server = http.createServer(async (req, res) => {
+  // Health check endpoint
+  if (req.url === '/healthz' && req.method === 'GET') {
+    if (pingpongAvailable) {
+      res.writeHead(200, { 'Content-Type': 'text/plain' });
+      res.end('OK');
+    } else {
+      res.writeHead(500, { 'Content-Type': 'text/plain' });
+      res.end('Ping-pong not available');
+    }
+    return;
+  }
+  
   if (req.url === '/' && req.method === 'GET') {
     let output = '';
     

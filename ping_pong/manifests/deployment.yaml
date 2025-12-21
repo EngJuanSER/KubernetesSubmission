@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: ping-pong
-          image: engjuanser/ping-pong:3.4
+          image: engjuanser/pingpong:4.1
           env:
             - name: PORT
               value: "3000"
@@ -27,3 +27,9 @@ spec:
               value: "postgres"
             - name: POSTGRES_PASSWORD
               value: "postgres"
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: 3000
+            initialDelaySeconds: 5
+            periodSeconds: 5

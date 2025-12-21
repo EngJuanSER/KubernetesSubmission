@@ -12,6 +12,8 @@ const pool = new Pool({
   password: process.env.POSTGRES_PASSWORD || 'postgres',
 });
 
+let dbConnected = false;
+
 console.log('Connecting to Postgres...');
 
 // Inicializar la base de datos
@@ -32,17 +34,46 @@ const initDB = async () => {
       const counterResult = await pool.query('SELECT count FROM pongs WHERE id = 1');
       console.log(`Database already initialized. Current counter: ${counterResult.rows[0].count}`);
     }
+    
+    dbConnected = true;
+    console.log('Database connection successful');
   } catch (err) {
-    console.error('Error initializing database:', err);
-    process.exit(1);
+    dbConnected = false;
+    console.error('Database connection failed:', err.message);
   }
 };
 
 initDB();
 
+// Retry connection every 5 seconds if not connected
+setInterval(() => {
+  if (!dbConnected) {
+    console.log('Attempting to reconnect to database...');
+    initDB();
+  }
+}, 5000);
+
 const server = http.createServer(async (req, res) => {
+  // Health check endpoint
+  if (req.url === '/healthz' && req.method === 'GET') {
+    if (dbConnected) {
+      res.writeHead(200, { 'Content-Type': 'text/plain' });
+      res.end('OK');
+    } else {
+      res.writeHead(500, { 'Content-Type': 'text/plain' });
+      res.end('Database not connected');
+    }
+    return;
+  }
+  
   // Main counter endpoint (for Gateway with URL rewriting)
   if (req.url === '/' && req.method === 'GET') {
+    if (!dbConnected) {
+      res.writeHead(500, { 'Content-Type': 'text/plain' });
+      res.end('Database not available');
+      return;
+    }
+    
     try {
       // Incrementar contador
       await pool.query('UPDATE pongs SET count = count + 1 WHERE id = 1');
@@ -57,11 +88,18 @@ const server = http.createServer(async (req, res) => {
       res.end(`pong ${counter}\n`);
     } catch (err) {
       console.error('Database error:', err);
+      dbConnected = false;
       res.writeHead(500, { 'Content-Type': 'text/plain' });
       res.end('Database error');
     }
     
   } else if (req.url === '/pings' && req.method === 'GET') {
+    if (!dbConnected) {
+      res.writeHead(500, { 'Content-Type': 'text/plain' });
+      res.end('0');
+      return;
+    }
+    
     try {
       // Endpoint para que otros pods obtengan el contador
       const result = await pool.query('SELECT count FROM pongs WHERE id = 1');
@@ -71,6 +109,7 @@ const server = http.createServer(async (req, res) => {
       res.end(counter.toString());
     } catch (err) {
       console.error('Database error:', err);
+      dbConnected = false;
       res.writeHead(500, { 'Content-Type': 'text/plain' });
       res.end('0');
     }

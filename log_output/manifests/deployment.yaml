@@ -29,7 +29,7 @@ spec:
             - name: shared-logs
               mountPath: /usr/src/app/files
         - name: reader
-          image: engjuanser/log-output-reader:2.5
+          image: engjuanser/log-output:4.1
           env:
             - name: MESSAGE
               valueFrom:
@@ -41,3 +41,9 @@ spec:
               mountPath: /usr/src/app/files
             - name: config-volume
               mountPath: /usr/src/app/config
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: 3000
+            initialDelaySeconds: 5
+            periodSeconds: 5
