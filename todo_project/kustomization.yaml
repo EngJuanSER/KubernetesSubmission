@@ -20,4 +20,4 @@ images:
     newTag: "2.6"
   - name: PROJECT/BACKEND
     newName: engjuanser/todo-backend
-    newTag: "3.5"
+    newTag: "4.2"

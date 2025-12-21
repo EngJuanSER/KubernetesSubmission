@@ -24,6 +24,8 @@ const pool = new Pool({
   password: process.env.POSTGRES_PASSWORD || 'postgres',
 });
 
+let dbConnected = false;
+
 log('info', 'Starting todo-backend', { port: PORT });
 log('info', 'Connecting to Postgres', { host: process.env.POSTGRES_HOST });
 
@@ -38,14 +40,23 @@ const initDB = async () => {
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       )
     `);
+    dbConnected = true;
     log('info', 'Database initialized successfully');
   } catch (err) {
+    dbConnected = false;
     log('error', 'Error initializing database', { error: err.message, stack: err.stack });
-    process.exit(1);
   }
 };
 
 initDB();
+
+// Retry connection every 5 seconds if not connected
+setInterval(() => {
+  if (!dbConnected) {
+    log('info', 'Attempting to reconnect to database');
+    initDB();
+  }
+}, 5000);
 
 // Función helper para logging de requests
 const logRequest = (method, path, statusCode, message = '', metadata = {}) => {
@@ -75,6 +86,18 @@ const server = http.createServer(async (req, res) => {
     return;
   }
   
+  // Health check endpoint
+  if (pathname === '/healthz' && method === 'GET') {
+    if (dbConnected) {
+      res.writeHead(200, { 'Content-Type': 'text/plain' });
+      res.end('OK');
+    } else {
+      res.writeHead(500, { 'Content-Type': 'text/plain' });
+      res.end('Database not connected');
+    }
+    return;
+  }
+  
   // Health check endpoint for Ingress
   if (pathname === '/' && method === 'GET') {
     res.writeHead(200, { 'Content-Type': 'text/plain' });
@@ -83,6 +106,13 @@ const server = http.createServer(async (req, res) => {
   }
   
   if (pathname === '/todos' && method === 'GET') {
+    if (!dbConnected) {
+      logRequest(method, pathname, 500, 'Database not available');
+      res.writeHead(500, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: 'Database not available' }));
+      return;
+    }
+    
     try {
       // GET /todos - Devolver lista de todos
       const result = await pool.query(
@@ -94,6 +124,7 @@ const server = http.createServer(async (req, res) => {
       res.writeHead(200, { 'Content-Type': 'application/json' });
       res.end(JSON.stringify(result.rows));
     } catch (err) {
+      dbConnected = false;
       console.error('✗ Database error on GET /todos:', err);
       logRequest(method, pathname, 500, 'Database error');
       
@@ -102,6 +133,13 @@ const server = http.createServer(async (req, res) => {
     }
     
   } else if (pathname === '/todos' && method === 'POST') {
+    if (!dbConnected) {
+      logRequest(method, pathname, 500, 'Database not available');
+      res.writeHead(500, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: 'Database not available' }));
+      return;
+    }
+    
     // POST /todos - Crear nuevo todo
     let body = '';
     
@@ -155,6 +193,7 @@ const server = http.createServer(async (req, res) => {
         res.writeHead(201, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify(newTodo));
       } catch (err) {
+        dbConnected = false;
         log('error', 'Error creating todo', { error: err.message, stack: err.stack });
         logRequest(method, pathname, 400, 'Bad Request');
         
