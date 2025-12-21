@@ -76,7 +76,7 @@ const server = http.createServer(async (req, res) => {
   
   // Habilitar CORS
   res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
   
   if (method === 'OPTIONS') {
@@ -195,6 +195,60 @@ const server = http.createServer(async (req, res) => {
       } catch (err) {
         dbConnected = false;
         log('error', 'Error creating todo', { error: err.message, stack: err.stack });
+        logRequest(method, pathname, 400, 'Bad Request');
+        
+        res.writeHead(400, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: 'Bad Request' }));
+      }
+    });
+    
+  } else if (pathname.match(/^\/todos\/\d+$/) && method === 'PUT') {
+    // PUT /todos/:id - Marcar todo como completado/incompleto
+    const todoId = pathname.split('/')[2];
+    
+    let body = '';
+    req.on('data', chunk => {
+      body += chunk.toString();
+    });
+    
+    req.on('end', async () => {
+      if (!dbConnected) {
+        logRequest(method, pathname, 500, 'Database not available');
+        res.writeHead(500, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: 'Database not available' }));
+        return;
+      }
+      
+      try {
+        const data = JSON.parse(body);
+        const completed = data.completed !== undefined ? data.completed : true;
+        
+        const result = await pool.query(
+          'UPDATE todos SET completed = $1 WHERE id = $2 RETURNING *',
+          [completed, todoId]
+        );
+        
+        if (result.rows.length === 0) {
+          log('warn', 'PUT /todos/:id - Todo not found', { todoId, statusCode: 404 });
+          logRequest(method, pathname, 404, `Todo not found: ${todoId}`);
+          res.writeHead(404, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ error: 'Todo not found' }));
+          return;
+        }
+        
+        const updatedTodo = result.rows[0];
+        log('info', 'PUT /todos/:id - Todo updated', { 
+          todoId: updatedTodo.id,
+          completed: updatedTodo.completed,
+          statusCode: 200 
+        });
+        logRequest(method, pathname, 200, `Updated todo ID: ${todoId}`, { todoId, completed });
+        
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify(updatedTodo));
+      } catch (err) {
+        dbConnected = false;
+        log('error', 'Error updating todo', { error: err.message, stack: err.stack, statusCode: 400 });
         logRequest(method, pathname, 400, 'Bad Request');
         
         res.writeHead(400, { 'Content-Type': 'application/json' });

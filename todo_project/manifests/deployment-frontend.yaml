@@ -15,26 +15,7 @@ spec:
       labels:
         app: todo-frontend
     spec:
-      volumes:
-        - name: shared-image
-          persistentVolumeClaim:
-            claimName: image-claim
       containers:
-        - name: image-fetcher
-          image: engjuanser/image-fetcher:2.6
-          resources:
-            requests:
-              memory: "8Mi"
-              cpu: "5m"
-            limits:
-              memory: "16Mi"
-              cpu: "25m"
-          volumeMounts:
-            - name: shared-image
-              mountPath: /usr/src/app/files
-          envFrom:
-            - configMapRef:
-                name: todo-project-config
         - name: todo-frontend
           image: PROJECT/FRONTEND
           resources:
@@ -44,9 +25,8 @@ spec:
             limits:
               memory: "32Mi"
               cpu: "50m"
-          volumeMounts:
-            - name: shared-image
-              mountPath: /usr/src/app/files
-          envFrom:
-            - configMapRef:
-                name: todo-project-config
+          env:
+            - name: PORT
+              value: "3001"
+            - name: BACKEND_URL
+              value: "http://todo-backend-svc:3000"
