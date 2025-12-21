@@ -1,0 +1,6 @@
+github-actions-key.json
+todo-backup-key.json
+.git/
+.github/
+*.md
+INSTRUCCIONES.md

@@ -1,0 +1,26 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: exercises
+
+resources:
+  - log_output/manifests/configmap.yaml
+  - log_output/manifests/deployment.yaml
+  - log_output/manifests/service.yaml
+  - ping_pong/manifests/deployment.yaml
+  - ping_pong/manifests/service.yaml
+  - postgres/manifests/statefulset.yaml
+  - postgres/manifests/service.yaml
+  - postgres/manifests/persistentvolumeclaim.yaml
+  - postgres/manifests/secret.yaml
+
+images:
+  - name: engjuanser/log-output-writer
+    newName: engjuanser/log-output-writer
+    newTag: "1.10"
+  - name: engjuanser/log-output
+    newName: engjuanser/log-output
+    newTag: "4.1"
+  - name: engjuanser/pingpong
+    newName: engjuanser/pingpong
+    newTag: "4.4-bad"
