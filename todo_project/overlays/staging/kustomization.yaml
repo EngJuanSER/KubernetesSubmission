@@ -1,0 +1,23 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: staging
+
+resources:
+  - ../../base
+
+namePrefix: staging-
+
+patches:
+  - path: deployment-broadcaster.yaml
+
+images:
+  - name: PROJECT/FRONTEND
+    newName: engjuanser/todo-frontend
+    newTag: "4.5"
+  - name: PROJECT/BACKEND
+    newName: engjuanser/todo-backend
+    newTag: "4.6"
+  - name: PROJECT/BROADCASTER
+    newName: engjuanser/todo-broadcaster
+    newTag: "4.6"

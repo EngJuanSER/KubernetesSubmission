@@ -1,0 +1,52 @@
+name: Deploy to Staging
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'todo_backend/**'
+      - 'todo_frontend/**'
+      - 'broadcaster/**'
+
+jobs:
+  build-and-deploy-staging:
+    name: Build and Deploy to Staging
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      
+      - name: Build and push images
+        run: |-
+          docker build --tag "engjuanser/todo-backend:$GITHUB_SHA" ./todo_backend
+          docker push "engjuanser/todo-backend:$GITHUB_SHA"
+          
+          docker build --tag "engjuanser/todo-frontend:$GITHUB_SHA" ./todo_frontend
+          docker push "engjuanser/todo-frontend:$GITHUB_SHA"
+          
+          docker build --tag "engjuanser/todo-broadcaster:$GITHUB_SHA" ./broadcaster
+          docker push "engjuanser/todo-broadcaster:$GITHUB_SHA"
+      
+      - name: Set up Kustomize
+        uses: imranismail/setup-kustomize@v2
+      
+      - name: Update staging images
+        working-directory: ./todo_project/overlays/staging
+        run: |-
+          kustomize edit set image PROJECT/BACKEND=engjuanser/todo-backend:$GITHUB_SHA
+          kustomize edit set image PROJECT/FRONTEND=engjuanser/todo-frontend:$GITHUB_SHA
+          kustomize edit set image PROJECT/BROADCASTER=engjuanser/todo-broadcaster:$GITHUB_SHA
+      
+      - name: Commit kustomization.yaml
+        uses: EndBug/add-and-commit@v9
+        with:
+          add: 'todo_project/overlays/staging/kustomization.yaml'
+          message: 'Deploy staging: ${{ github.sha }}'
