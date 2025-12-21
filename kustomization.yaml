@@ -7,12 +7,6 @@ resources:
   - log_output/manifests/configmap.yaml
   - log_output/manifests/deployment.yaml
   - log_output/manifests/service.yaml
-  - ping_pong/manifests/deployment.yaml
-  - ping_pong/manifests/service.yaml
-  - postgres/manifests/statefulset.yaml
-  - postgres/manifests/service.yaml
-  - postgres/manifests/persistentvolumeclaim.yaml
-  - postgres/manifests/secret.yaml
 
 images:
   - name: engjuanser/log-output-writer
@@ -21,6 +15,3 @@ images:
   - name: engjuanser/log-output
     newName: engjuanser/log-output
     newTag: "4.1"
-  - name: engjuanser/pingpong
-    newName: engjuanser/pingpong
-    newTag: "4.4-bad"
