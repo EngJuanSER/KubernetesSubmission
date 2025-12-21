@@ -48,6 +48,13 @@ This repository contains my submissions for the [DevOps with Kubernetes](https:/
 - [3.11.](https://github.com/EngJuanSER/KubernetesSubmission/tree/3.11) Resource requests and limits
 - [3.12.](https://github.com/EngJuanSER/KubernetesSubmission/tree/3.12) Structured logging for Google Cloud Logging
 
+### Part 4
+
+- [4.1.](https://github.com/EngJuanSER/KubernetesSubmission/tree/4.1) ReadinessProbes for Ping-pong and Log Output
+- [4.2.](https://github.com/EngJuanSER/KubernetesSubmission/tree/4.2) ReadinessProbe and LivenessProbe for Todo backend
+- [4.3.](https://github.com/EngJuanSER/KubernetesSubmission/tree/4.3) Prometheus query to count StatefulSet pods
+
+
 ## Exercise 3.9: DBaaS vs DIY Analysis
 
 ### Comparison Summary
