@@ -17,6 +17,9 @@ patches:
         path: /spec/replicas
         value: 2
       - op: replace
+        path: /spec/template/spec/containers/0/env/0/value
+        value: "prod-postgres-svc"
+      - op: replace
         path: /spec/template/spec/containers/0/env/1/value
         value: "nats://my-nats.project.svc.cluster.local:4222"
   - target:
