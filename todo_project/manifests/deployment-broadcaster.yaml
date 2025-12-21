@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: broadcaster
-          image: engjuanser/todo-broadcaster:4.6
+          image: PROJECT/BROADCASTER
           resources:
             requests:
               cpu: "50m"

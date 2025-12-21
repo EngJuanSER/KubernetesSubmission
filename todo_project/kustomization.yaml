@@ -23,3 +23,6 @@ images:
   - name: PROJECT/BACKEND
     newName: engjuanser/todo-backend
     newTag: "4.6"
+  - name: PROJECT/BROADCASTER
+    newName: engjuanser/todo-broadcaster
+    newTag: "4.6"
