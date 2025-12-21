@@ -1,8 +1,10 @@
 const http = require('http');
 const url = require('url');
 const { Pool } = require('pg');
+const { connect, StringCodec } = require('nats');
 
 const PORT = process.env.PORT || 3000;
+const NATS_URL = process.env.NATS_URL || 'nats://my-nats.project.svc.cluster.local:4222';
 
 // Función para logs estructurados en formato JSON
 const log = (level, message, metadata = {}) => {
@@ -25,9 +27,54 @@ const pool = new Pool({
 });
 
 let dbConnected = false;
+let natsConnected = false;
+let nc = null;
+const sc = StringCodec();
 
 log('info', 'Starting todo-backend', { port: PORT });
 log('info', 'Connecting to Postgres', { host: process.env.POSTGRES_HOST });
+
+// Conectar a NATS
+const connectNATS = async () => {
+  try {
+    nc = await connect({
+      servers: NATS_URL,
+      maxReconnectAttempts: -1,
+      reconnectTimeWait: 1000,
+    });
+    natsConnected = true;
+    log('info', 'Connected to NATS successfully', { url: NATS_URL });
+  } catch (err) {
+    natsConnected = false;
+    log('error', 'Failed to connect to NATS', { error: err.message });
+  }
+};
+
+// Publicar evento a NATS
+const publishEvent = async (action, todo) => {
+  if (!natsConnected || !nc) {
+    log('warn', 'NATS not connected, skipping event publish', { action, todoId: todo.id });
+    return;
+  }
+  
+  try {
+    const event = {
+      action,
+      todo: {
+        id: todo.id,
+        text: todo.text,
+        completed: todo.completed,
+        created_at: todo.created_at
+      },
+      timestamp: new Date().toISOString()
+    };
+    
+    nc.publish('todo.events', sc.encode(JSON.stringify(event)));
+    log('info', 'Published event to NATS', { action, todoId: todo.id });
+  } catch (err) {
+    log('error', 'Failed to publish event to NATS', { error: err.message });
+  }
+};
 
 // Inicializar la base de datos
 const initDB = async () => {
@@ -49,12 +96,17 @@ const initDB = async () => {
 };
 
 initDB();
+connectNATS();
 
 // Retry connection every 5 seconds if not connected
 setInterval(() => {
   if (!dbConnected) {
     log('info', 'Attempting to reconnect to database');
     initDB();
+  }
+  if (!natsConnected) {
+    log('info', 'Attempting to reconnect to NATS');
+    connectNATS();
   }
 }, 5000);
 
@@ -184,6 +236,10 @@ const server = http.createServer(async (req, res) => {
         );
         
         const newTodo = result.rows[0];
+        
+        // Publicar evento a NATS
+        await publishEvent('created', newTodo);
+        
         log('info', 'Todo created', { 
           todoId: newTodo.id, 
           text: newTodo.text.substring(0, 50) + (newTodo.text.length > 50 ? '...' : '')
@@ -237,6 +293,10 @@ const server = http.createServer(async (req, res) => {
         }
         
         const updatedTodo = result.rows[0];
+        
+        // Publicar evento a NATS
+        await publishEvent('updated', updatedTodo);
+        
         log('info', 'PUT /todos/:id - Todo updated', { 
           todoId: updatedTodo.id,
           completed: updatedTodo.completed,

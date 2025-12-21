@@ -6,10 +6,12 @@ namespace: project
 resources:
   - manifests/configmap.yaml
   - manifests/secret.yaml
+  - manifests/secret-broadcaster.yaml
   - manifests/persistentvolumeclaim.yaml
   - manifests/statefulset-postgres.yaml
   - manifests/deployment-backend.yaml
   - manifests/deployment-frontend.yaml
+  - manifests/deployment-broadcaster.yaml
   - manifests/service-backend.yaml
   - manifests/service-frontend.yaml
   - manifests/ingress.yaml
@@ -20,4 +22,4 @@ images:
     newTag: "4.5"
   - name: PROJECT/BACKEND
     newName: engjuanser/todo-backend
-    newTag: "4.5"
+    newTag: "4.6"
