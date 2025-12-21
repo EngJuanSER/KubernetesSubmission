@@ -16,6 +16,9 @@ patches:
       - op: replace
         path: /spec/replicas
         value: 2
+      - op: replace
+        path: /spec/template/spec/containers/0/env/1/value
+        value: "nats://my-nats.project.svc.cluster.local:4222"
   - target:
       kind: Deployment
       name: todo-frontend
@@ -23,6 +26,13 @@ patches:
       - op: replace
         path: /spec/replicas
         value: 2
+  - target:
+      kind: Deployment
+      name: todo-broadcaster
+    patch: |-
+      - op: replace
+        path: /spec/template/spec/containers/0/env/0/value
+        value: "nats://my-nats.project.svc.cluster.local:4222"
 
 images:
   - name: PROJECT/FRONTEND

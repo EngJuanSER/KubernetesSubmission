@@ -19,11 +19,20 @@ patchesJson6902:
         path: /spec/template/spec/containers/0/env
         value:
           - name: NATS_URL
-            value: "nats://my-nats:4222"
+            value: "nats://my-nats.project.svc.cluster.local:4222"
           - name: WEBHOOK_URL
             value: ""
           - name: WEBHOOK_TYPE
             value: "generic"
+  - target:
+      group: apps
+      version: v1
+      kind: Deployment
+      name: todo-backend
+    patch: |-
+      - op: replace
+        path: /spec/template/spec/containers/0/env/1/value
+        value: "nats://my-nats.project.svc.cluster.local:4222"
 
 images:
   - name: PROJECT/FRONTEND
