@@ -3,8 +3,8 @@ const url = require('url');
 const { Pool } = require('pg');
 const { connect, StringCodec } = require('nats');
 
-// Exercise 4.10: Using separate repositories for code and config
-// This ensures GitOps separation of concerns - code and manifests in different repos
+// Exercise 4.10: Separate repositories for code and config
+// Code repository: KubernetesSubmission | Config repository: KubernetesConfig
 const PORT = process.env.PORT || 3000;
 const NATS_URL = process.env.NATS_URL || 'nats://my-nats.project.svc.cluster.local:4222';
 
