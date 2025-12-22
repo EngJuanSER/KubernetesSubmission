@@ -1,0 +1,13 @@
+{
+  "name": "dummysite-controller",
+  "version": "1.0.0",
+  "description": "Controller for DummySite CRD",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "@kubernetes/client-node": "^0.20.0",
+    "axios": "^1.6.0"
+  }
+}
