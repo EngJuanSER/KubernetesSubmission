@@ -53,7 +53,18 @@ This repository contains my submissions for the [DevOps with Kubernetes](https:/
 - [4.1.](https://github.com/EngJuanSER/KubernetesSubmission/tree/4.1) ReadinessProbes for Ping-pong and Log Output
 - [4.2.](https://github.com/EngJuanSER/KubernetesSubmission/tree/4.2) ReadinessProbe and LivenessProbe for Todo backend
 - [4.3.](https://github.com/EngJuanSER/KubernetesSubmission/tree/4.3) Prometheus query to count StatefulSet pods
+- [4.4.](https://github.com/EngJuanSER/KubernetesSubmission/tree/4.4) NetworkPolicy for Todo backend access control
+- [4.5.](https://github.com/EngJuanSER/KubernetesSubmission/tree/4.5) Analysis of Kubernetes security practices
+- [4.6.](https://github.com/EngJuanSER/KubernetesSubmission/tree/4.6) GitOps with Argo CD and auto-sync
+- [4.7.](https://github.com/EngJuanSER/KubernetesSubmission/tree/4.7) Canary deployment with Argo Rollouts
+- [4.8.](https://github.com/EngJuanSER/KubernetesSubmission/tree/4.8) Analysis of Knative, OpenFaaS, and Argo Events
+- [4.9.](https://github.com/EngJuanSER/KubernetesSubmission/tree/4.9) Staging and Production environments with GitOps
+- [4.10.](https://github.com/EngJuanSER/KubernetesSubmission/tree/4.10) Separate configuration repository for GitOps
 
+### Part 5
+
+- [5.1.](https://github.com/EngJuanSER/KubernetesSubmission/tree/5.1) Custom Resource Definition (CRD) with DummySite controller
+- [5.2.](https://github.com/EngJuanSER/KubernetesSubmission/tree/5.2) Getting started with Istio service mesh
 
 ## Exercise 3.9: DBaaS vs DIY Analysis
 
@@ -139,11 +150,3 @@ This repository contains my submissions for the [DevOps with Kubernetes](https:/
 - Automatic disaster recovery
 - Professional support
 - Worth the cost for peace of mind
-
-### Part 4
-
-
-### Part 5
-
-
-### Part 6
