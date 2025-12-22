@@ -5,6 +5,7 @@ const PORT = 3000;
 const logFile = '/usr/src/app/files/log.txt';
 const configFile = '/usr/src/app/config/information.txt';
 const PING_PONG_URL = 'http://ping-pong-svc.exercises:3000/pings';
+const GREETER_URL = process.env.GREETER_URL || 'http://greeter-svc.default:3000/greet';
 const MESSAGE = process.env.MESSAGE || 'no message';
 
 let pingpongAvailable = false;
@@ -22,6 +23,24 @@ const getPingCount = () => {
       });
     }).on('error', (err) => {
       console.error('Error fetching ping count:', err);
+      reject(err);
+    });
+  });
+};
+
+// Función para obtener el greeting del greeter service
+const getGreeting = () => {
+  return new Promise((resolve, reject) => {
+    http.get(GREETER_URL, (response) => {
+      let data = '';
+      response.on('data', (chunk) => {
+        data += chunk;
+      });
+      response.on('end', () => {
+        resolve(data.trim());
+      });
+    }).on('error', (err) => {
+      console.error('Error fetching greeting:', err);
       reject(err);
     });
   });
@@ -83,7 +102,15 @@ const server = http.createServer(async (req, res) => {
       console.error('Failed to get ping count');
     }
     
-    const response = `file content: ${fileContent}\nenv variable: MESSAGE=${MESSAGE}\n${output}\nPing / Pongs: ${counter}`;
+    // Obtener greeting del greeter service
+    let greeting = 'Greeter not available';
+    try {
+      greeting = await getGreeting();
+    } catch (err) {
+      console.error('Failed to get greeting');
+    }
+    
+    const response = `file content: ${fileContent}\nenv variable: MESSAGE=${MESSAGE}\n${output}\nPing / Pongs: ${counter}\n${greeting}`;
     
     res.writeHead(200, { 'Content-Type': 'text/plain' });
     res.end(response);

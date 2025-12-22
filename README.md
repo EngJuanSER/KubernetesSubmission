@@ -65,6 +65,7 @@ This repository contains my submissions for the [DevOps with Kubernetes](https:/
 
 - [5.1.](https://github.com/EngJuanSER/KubernetesSubmission/tree/5.1) Custom Resource Definition (CRD) with DummySite controller
 - [5.2.](https://github.com/EngJuanSER/KubernetesSubmission/tree/5.2) Getting started with Istio service mesh
+- [5.3.](https://github.com/EngJuanSER/KubernetesSubmission/tree/5.3) Log output with greeter service and traffic splitting
 
 ## Exercise 3.9: DBaaS vs DIY Analysis
 
