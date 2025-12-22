@@ -6,7 +6,7 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: https://github.com/EngJuanSER/KubernetesSubmission
+    repoURL: https://github.com/EngJuanSER/KubernetesConfig
     path: todo_project/overlays/production
     targetRevision: main
   destination:

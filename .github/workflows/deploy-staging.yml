@@ -38,15 +38,25 @@ jobs:
       - name: Set up Kustomize
         uses: imranismail/setup-kustomize@v2
       
+      - name: Checkout config repository
+        uses: actions/checkout@v4
+        with:
+          repository: EngJuanSER/KubernetesConfig
+          token: ${{ secrets.GH_PAT }}
+          path: config
+      
       - name: Update staging images
-        working-directory: ./todo_project/overlays/staging
+        working-directory: ./config/todo_project/overlays/staging
         run: |-
           kustomize edit set image PROJECT/BACKEND=engjuanser/todo-backend:$GITHUB_SHA
           kustomize edit set image PROJECT/FRONTEND=engjuanser/todo-frontend:$GITHUB_SHA
           kustomize edit set image PROJECT/BROADCASTER=engjuanser/todo-broadcaster:$GITHUB_SHA
       
-      - name: Commit kustomization.yaml
-        uses: EndBug/add-and-commit@v9
-        with:
-          add: 'todo_project/overlays/staging/kustomization.yaml'
-          message: 'Deploy staging: ${{ github.sha }}'
+      - name: Commit and push to config repository
+        working-directory: ./config
+        run: |-
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+          git add todo_project/overlays/staging/kustomization.yaml
+          git commit -m "Deploy staging: ${{ github.sha }}"
+          git push
