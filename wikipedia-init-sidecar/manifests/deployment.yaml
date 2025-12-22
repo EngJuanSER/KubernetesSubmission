@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: wikipedia-init-sidecar
+  namespace: default
+  labels:
+    app: wikipedia-init-sidecar
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: wikipedia-init-sidecar
+  template:
+    metadata:
+      labels:
+        app: wikipedia-init-sidecar
+    spec:
+      initContainers:
+      - name: wikipedia-init
+        image: engjuanser/wikipedia-init:5.4
+        imagePullPolicy: Never
+        volumeMounts:
+        - name: html-content
+          mountPath: /usr/share/nginx/html
+      containers:
+      - name: nginx
+        image: nginx:alpine
+        ports:
+        - containerPort: 80
+          name: http
+        volumeMounts:
+        - name: html-content
+          mountPath: /usr/share/nginx/html
+      - name: wikipedia-sidecar
+        image: engjuanser/wikipedia-sidecar:5.4
+        imagePullPolicy: Never
+        volumeMounts:
+        - name: html-content
+          mountPath: /usr/share/nginx/html
+      volumes:
+      - name: html-content
+        emptyDir: {}

@@ -1,0 +1,8 @@
+FROM alpine:latest
+
+RUN apk add --no-cache curl bash
+
+COPY sidecar-fetch.sh /sidecar-fetch.sh
+RUN chmod +x /sidecar-fetch.sh
+
+ENTRYPOINT ["/sidecar-fetch.sh"]

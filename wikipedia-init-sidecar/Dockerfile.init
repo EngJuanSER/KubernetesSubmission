@@ -1,0 +1,8 @@
+FROM alpine:latest
+
+RUN apk add --no-cache curl
+
+COPY init-fetch.sh /init-fetch.sh
+RUN chmod +x /init-fetch.sh
+
+ENTRYPOINT ["/init-fetch.sh"]
