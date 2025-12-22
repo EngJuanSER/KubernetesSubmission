@@ -10,11 +10,25 @@ namePrefix: staging-
 
 patchesJson6902:
   - target:
+      version: v1
+      kind: ConfigMap
+      name: todo-project-config
+    patch: |-
+      - op: replace
+        path: /data/POSTGRES_HOST
+        value: "staging-postgres-svc"
+      - op: replace
+        path: /data/BACKEND_URL
+        value: "http://staging-todo-backend-svc:3000"
+  - target:
       group: apps
       version: v1
       kind: Deployment
       name: todo-broadcaster
     patch: |-
+      - op: replace
+        path: /spec/replicas
+        value: 1
       - op: replace
         path: /spec/template/spec/containers/0/env
         value:
@@ -24,18 +38,6 @@ patchesJson6902:
             value: ""
           - name: WEBHOOK_TYPE
             value: "generic"
-  - target:
-      group: apps
-      version: v1
-      kind: Deployment
-      name: todo-backend
-    patch: |-
-      - op: replace
-        path: /spec/template/spec/containers/0/env/0/value
-        value: "staging-postgres-svc"
-      - op: replace
-        path: /spec/template/spec/containers/0/env/1/value
-        value: "nats://my-nats.project.svc.cluster.local:4222"
 
 images:
   - name: PROJECT/FRONTEND

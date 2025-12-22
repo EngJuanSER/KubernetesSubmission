@@ -10,15 +10,23 @@ namePrefix: prod-
 
 patches:
   - target:
+      version: v1
+      kind: ConfigMap
+      name: todo-project-config
+    patch: |-
+      - op: replace
+        path: /data/POSTGRES_HOST
+        value: "prod-postgres-svc"
+      - op: replace
+        path: /data/BACKEND_URL
+        value: "http://prod-todo-backend-svc:3000"
+  - target:
       kind: Deployment
       name: todo-backend
     patch: |-
       - op: replace
         path: /spec/replicas
         value: 2
-      - op: replace
-        path: /spec/template/spec/containers/0/env/0/value
-        value: "prod-postgres-svc"
       - op: replace
         path: /spec/template/spec/containers/0/env/1/value
         value: "nats://my-nats.project.svc.cluster.local:4222"
@@ -33,6 +41,9 @@ patches:
       kind: Deployment
       name: todo-broadcaster
     patch: |-
+      - op: replace
+        path: /spec/replicas
+        value: 1
       - op: replace
         path: /spec/template/spec/containers/0/env/0/value
         value: "nats://my-nats.project.svc.cluster.local:4222"
