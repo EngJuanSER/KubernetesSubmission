@@ -68,6 +68,7 @@ This repository contains my submissions for the [DevOps with Kubernetes](https:/
 - [5.3.](https://github.com/EngJuanSER/KubernetesSubmission/tree/5.3) Log output with greeter service and traffic splitting
 - [5.4.](https://github.com/EngJuanSER/KubernetesSubmission/tree/5.4) Wikipedia with init container and sidecar
 - [5.6.](https://github.com/EngJuanSER/KubernetesSubmission/tree/5.6) Trying serverless with Knative
+- [5.7.](https://github.com/EngJuanSER/KubernetesSubmission/tree/5.7) Deploy ping-pong to serverless with Knative
 
 ## Exercise 3.9: DBaaS vs DIY Analysis
 
